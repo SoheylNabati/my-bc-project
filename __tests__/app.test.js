@@ -39,7 +39,7 @@ describe("app", () => {
       .get("/api/getalltopics")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("404 page not found!");
+        expect(body.msg).toBe("404 Page Not Found!");
       });
   });
 });

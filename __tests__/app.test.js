@@ -32,3 +32,14 @@ describe("GET /api/topics", () => {
       });
   });
 });
+
+describe("app", () => {
+  it("should respond with a 404 error and a msg telling user that the page does not exist when user requested an endpoint that does not exist", () => {
+    return request(app)
+      .get("/api/getalltopics")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("404 page not found!");
+      });
+  });
+});

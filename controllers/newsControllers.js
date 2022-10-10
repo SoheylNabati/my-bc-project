@@ -1,4 +1,8 @@
-const { fetchTopics, fetchArticle } = require("../models/newsModels");
+const {
+  fetchTopics,
+  fetchArticle,
+  fetchUsers,
+} = require("../models/newsModels");
 exports.getTopics = (req, res, next) => {
   return fetchTopics().then((topics) => {
     return res.status(200).send({ topics });
@@ -12,4 +16,10 @@ exports.getArticle = (req, res, next) => {
       return res.status(200).send({ article });
     })
     .catch(next);
+};
+
+exports.getUsers = (req, res, next) => {
+  return fetchUsers().then((users) => {
+    return res.status(200).send({ users });
+  });
 };

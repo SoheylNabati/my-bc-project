@@ -1,5 +1,6 @@
-# News API
+# My News API
 
-## requirements:
+## requirement :
 
-you will need to install npm and set .env files for each development and test files to be able to run this repo locally.
+you will need to install npm and set .env files for each development and tests files to be able to run this repo locally.
+make sure that you will set your .env files in a .gitignore file and they are not pushed to github.

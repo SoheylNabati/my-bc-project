@@ -1,15 +1,21 @@
 const express = require("express");
-const { getTopics } = require("./controllers/newsControllers");
+const { getTopics, getArticleById } = require("./controllers/newsControllers");
+const {
+  invalidEndpoint,
+  serverError,
+  PSQLerrors,
+  costumError,
+} = require(`./controllers/errorHandling.controller`);
+
 const app = express();
+// app.use(express.json());
 
 app.get("/api/topics", getTopics);
+app.get(`/api/articles/:article_id`, getArticleById);
 
-app.use("*", (req, res) => {
-  res.status(404).send({ msg: "404 Page Not Found!" });
-});
-
-app.use((err, req, res, next) => {
-  res.status(500).send({ msg: "500 Server Error" });
-});
+app.all("*", invalidEndpoint);
+app.use(costumError);
+app.use(PSQLerrors);
+app.use(serverError);
 
 module.exports = app;

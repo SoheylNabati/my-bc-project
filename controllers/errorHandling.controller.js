@@ -7,7 +7,7 @@ exports.PSQLerrors = (err, req, res, next) => {
   next(err);
 };
 
-exports.costumError = (err, req, res, next) => {
+exports.customError = (err, req, res, next) => {
   if (err.status) res.status(err.status).send({ msg: err.msg });
   next(err);
 };

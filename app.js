@@ -1,10 +1,14 @@
 const express = require("express");
-const { getTopics, getArticleById } = require("./controllers/newsControllers");
+const {
+  getTopics,
+  getArticleById,
+  getUsers,
+} = require("./controllers/newsControllers");
 const {
   invalidEndpoint,
   serverError,
   PSQLerrors,
-  costumError,
+  customError,
 } = require(`./controllers/errorHandling.controller`);
 
 const app = express();
@@ -12,9 +16,10 @@ const app = express();
 
 app.get("/api/topics", getTopics);
 app.get(`/api/articles/:article_id`, getArticleById);
+app.get(`/api/users`, getUsers);
 
 app.all("*", invalidEndpoint);
-app.use(costumError);
+app.use(customError);
 app.use(PSQLerrors);
 app.use(serverError);
 

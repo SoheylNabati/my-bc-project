@@ -5,7 +5,7 @@ exports.getTopics = (req, res, next) => {
   });
 };
 
-exports.getArticle = (req, res, next) => {
+exports.getArticleById = (req, res, next) => {
   const id = req.params.article_id;
   return fetchArticle(id)
     .then((article) => {

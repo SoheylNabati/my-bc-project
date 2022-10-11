@@ -22,3 +22,14 @@ exports.fetchUsers = () => {
     return rows;
   });
 };
+
+exports.editArticleVotesByID = (id, IncVote) => {
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
+      [IncVote, id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};

@@ -30,6 +30,9 @@ exports.editArticleVotesByID = (id, IncVote) => {
       [IncVote, id]
     )
     .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ msg: "Article Not Found", status: 404 });
+      }
       return rows[0];
     });
 };

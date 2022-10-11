@@ -70,7 +70,7 @@ describe("GET /api/articles/:article_id", () => {
         expect(body.msg).toBe("Invalid ID");
       });
   });
-  it("404: responds with an error message when passed a director id that is valid but does not exist in the database", () => {
+  it("404: responds with an error message when passed a article id that is valid but does not exist in the database", () => {
     return request(app)
       .get(`/api/articles/21858583`)
       .expect(404)
@@ -120,6 +120,55 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.article).toEqual(updatedArticle2);
+      });
+  });
+  it("200: update votes count, respond with newly updated article", () => {
+    const updateVotes = {
+      votes: -98,
+    };
+    const article1 = {
+      article_id: 1,
+      title: "Living in the shadow of a great man",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "I find this existence challenging",
+      created_at: "2020-07-09T20:11:00.000Z",
+      votes: 2,
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(updateVotes)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toEqual(article1);
+        expect(body.article.votes).toBe(2);
+      });
+  });
+
+  it("400: respond with an error message when pased an article id that is invalid type", () => {
+    const updateVotes = {
+      votes: 16,
+    };
+
+    return request(app)
+      .patch(`/api/articles/pasta`)
+      .send(updateVotes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid ID");
+      });
+  });
+
+  it("404: responds with an error message when passed a article id that is valid but does not exist in the database", () => {
+    const updateVotes = {
+      votes: 7,
+    };
+    return request(app)
+      .patch("/api/articles/25")
+      .send(updateVotes)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Article Not Found");
       });
   });
 });

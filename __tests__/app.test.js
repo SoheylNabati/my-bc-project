@@ -62,4 +62,20 @@ describe.only("GET /api/articles/:article_id", () => {
         });
       });
   });
+  it("400: respond with an error message when pased an article id that is invalid type", () => {
+    return request(app)
+      .get(`/api/articles/cheese`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid ID");
+      });
+  });
+  it("404: responds with an error message when passed a director id that is valid but does not exist in the database", () => {
+    return request(app)
+      .get(`/api/articles/21858583`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article Not Found");
+      });
+  });
 });

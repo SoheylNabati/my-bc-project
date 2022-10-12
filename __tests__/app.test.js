@@ -210,4 +210,16 @@ describe.only(`GET /api/articles`, () => {
         });
       });
   });
+  it("200: responds with an array of article objects which are sorted by date in descending order", () => {
+    return request(app)
+      .get(`/api/articles`)
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.articles;
+        expect(article).toBeSortedBy("created_at", {
+          descending: true,
+          coerce: true,
+        });
+      });
+  });
 });

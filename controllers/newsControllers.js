@@ -3,6 +3,7 @@ const {
   fetchArticle,
   fetchUsers,
   editArticleVotesByID,
+  fetchArticles,
 } = require("../models/newsModels");
 exports.getTopics = (req, res, next) => {
   return fetchTopics().then((topics) => {
@@ -33,4 +34,10 @@ exports.patchArticleVotesByID = (req, res, next) => {
       return res.status(200).send({ article: updatedArticle });
     })
     .catch(next);
+};
+
+exports.getArticles = (req, res, next) => {
+  return fetchArticles().then((articles) => {
+    return res.status(200).send({ articles });
+  });
 };

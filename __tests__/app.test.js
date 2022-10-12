@@ -186,3 +186,28 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe.only(`GET /api/articles`, () => {
+  it("200: responds with an array of article obj which have properties of author, title, article_id, topic, created_at, votes, comment_count which is the total count of all the comments with this article_id", () => {
+    return request(app)
+      .get(`/api/articles`)
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.articles;
+        expect(article).toBeInstanceOf(Array);
+        article.forEach((each) => {
+          expect(each).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+});

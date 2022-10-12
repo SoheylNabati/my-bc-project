@@ -32,6 +32,11 @@ exports.editArticleVotesByID = (id, IncVote) => {
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ msg: "Article Not Found", status: 404 });
+      } else if (typeof IncVote !== "number") {
+        return Promise.reject({
+          msg: "Invalid Input, Type Of Votes Should Be A Number",
+          status: 400,
+        });
       }
       return rows[0];
     });

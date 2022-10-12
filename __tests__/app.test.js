@@ -171,4 +171,18 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toEqual("Article Not Found");
       });
   });
+  it("400: responds with an error message when passed a invalid data type to increment votes", () => {
+    const updateVotes = {
+      votes: "cheese",
+    };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(updateVotes)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual(
+          "Invalid Input, Type Of Votes Should Be A Number"
+        );
+      });
+  });
 });

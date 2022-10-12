@@ -22,3 +22,22 @@ exports.fetchUsers = () => {
     return rows;
   });
 };
+
+exports.editArticleVotesByID = (id, IncVote) => {
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
+      [IncVote, id]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ msg: "Article Not Found", status: 404 });
+      } else if (typeof IncVote !== "number") {
+        return Promise.reject({
+          msg: "Invalid Input, Type Of Votes Should Be A Number",
+          status: 400,
+        });
+      }
+      return rows[0];
+    });
+};

@@ -3,7 +3,15 @@ exports.invalidEndpoint = (req, res) => {
 };
 
 exports.PSQLerrors = (err, req, res, next) => {
-  if (err.code === "22P02") res.status(400).send({ msg: "Invalid ID" });
+  if (
+    err.code === "22P02" &&
+    typeof req.body.votes !== "number" &&
+    req.route.methods.patch === true
+  ) {
+    res
+      .status(400)
+      .send({ msg: "Invalid Input, Type Of Votes Should Be A Number" });
+  } else if (err.code === "22P02") res.status(400).send({ msg: "Invalid ID" });
   next(err);
 };
 

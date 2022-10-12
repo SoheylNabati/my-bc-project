@@ -3,6 +3,7 @@ const {
   getTopics,
   getArticleById,
   getUsers,
+  patchArticleVotesByID,
 } = require("./controllers/newsControllers");
 const {
   invalidEndpoint,
@@ -12,11 +13,12 @@ const {
 } = require(`./controllers/errorHandling.controller`);
 
 const app = express();
-// app.use(express.json());
+app.use(express.json());
 
 app.get("/api/topics", getTopics);
 app.get(`/api/articles/:article_id`, getArticleById);
 app.get(`/api/users`, getUsers);
+app.patch(`/api/articles/:article_id`, patchArticleVotesByID);
 
 app.all("*", invalidEndpoint);
 app.use(customError);

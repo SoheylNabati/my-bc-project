@@ -267,4 +267,15 @@ describe(`GET /api/articles`, () => {
         expect(body.msg).toBe(`No Topic Found For Topic ${topic}`);
       });
   });
+  it("200: responds with an empty array when a topic exists but there are no articles for that topic", () => {
+    const topic = "paper";
+    return request(app)
+      .get(`/api/articles?topic=${topic}`)
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(0);
+      });
+  });
 });

@@ -62,13 +62,24 @@ ORDER BY articles.created_at DESC;`;
   WHERE articles.topic='${topic}'
   GROUP BY articles.article_id
   ORDER BY articles.created_at DESC;`;
-  return db.query(queryStr).then(({ rows }) => {
-    if (rows.length === 0) {
+  const promise1 = db
+    .query(`SELECT topics.* FROM topics WHERE topics.slug='${topic}';`)
+    .then(({ rows }) => {
+      const myArr = [];
+      if (rows[0] !== undefined) myArr.push(rows[0].slug);
+      return myArr;
+    });
+  const promise2 = db.query(queryStr).then(({ rows }) => {
+    return rows;
+  });
+  return Promise.all([promise1, promise2]).then((result) => {
+    if (result[1].length === 0 && result[0].length === 0) {
       return Promise.reject({
         status: 404,
         msg: `No Topic Found For Topic ${topic}`,
       });
     }
-    return rows;
+    console.log(result[1]);
+    return result[1];
   });
 };

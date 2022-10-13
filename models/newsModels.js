@@ -41,3 +41,5 @@ exports.editArticleVotesByID = (id, IncVote) => {
       return rows[0];
     });
 };
+
+exports.fetchCommentsByArticleID = () => {};

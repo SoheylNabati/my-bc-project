@@ -4,6 +4,7 @@ const {
   getArticleById,
   getUsers,
   patchArticleVotesByID,
+  getCommentsByArticleID,
 } = require("./controllers/newsControllers");
 const {
   invalidEndpoint,
@@ -19,6 +20,7 @@ app.get("/api/topics", getTopics);
 app.get(`/api/articles/:article_id`, getArticleById);
 app.get(`/api/users`, getUsers);
 app.patch(`/api/articles/:article_id`, patchArticleVotesByID);
+app.get(`/api/articles/:article_id/comments`, getCommentsByArticleID);
 
 app.all("*", invalidEndpoint);
 app.use(customError);

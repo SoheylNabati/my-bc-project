@@ -34,3 +34,9 @@ exports.patchArticleVotesByID = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.getCommentsByArticleID = (req, res, next) => {
+  return fetchCommentsByArticleID(article_id)
+    .then(() => {})
+    .catch(next);
+};

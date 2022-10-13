@@ -37,7 +37,10 @@ exports.patchArticleVotesByID = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  return fetchArticles().then((articles) => {
-    return res.status(200).send({ articles });
-  });
+  const { topic } = req.query;
+  return fetchArticles(topic)
+    .then((articles) => {
+      return res.status(200).send({ articles });
+    })
+    .catch(next);
 };

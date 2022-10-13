@@ -187,7 +187,7 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe.only(`GET /api/articles`, () => {
+describe(`GET /api/articles`, () => {
   it("200: responds with an array of article obj which have properties of author, title, article_id, topic, created_at, votes, comment_count which is the total count of all the comments with this article_id", () => {
     return request(app)
       .get(`/api/articles`)
@@ -201,6 +201,7 @@ describe.only(`GET /api/articles`, () => {
               author: expect.any(String),
               title: expect.any(String),
               article_id: expect.any(Number),
+              body: expect.any(String),
               topic: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
@@ -220,6 +221,50 @@ describe.only(`GET /api/articles`, () => {
           descending: true,
           coerce: true,
         });
+      });
+  });
+  it("200: accespts topic endpoint, which filters the articles by the topic value specified in the query.", () => {
+    const topic = "cats";
+    return request(app)
+      .get(`/api/articles?topic=${topic}`)
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        const filtered = articles.filter((article) => article.topic === topic);
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(1);
+        filtered.forEach((each) => {
+          expect(each).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              body: expect.any(String),
+              topic: topic,
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  it("400: responds with an error msg when the requested topic is not given", () => {
+    const topic = "";
+    return request(app)
+      .get(`/api/articles?topic=${topic}`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad Request, Please enter name of topic`);
+      });
+  });
+  it("404: responds with an error msg when requested for a query that doesnt exist ", () => {
+    const topic = "cheese";
+    return request(app)
+      .get(`/api/articles?topic=${topic}`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`No Topic Found For Topic ${topic}`);
       });
   });
 });

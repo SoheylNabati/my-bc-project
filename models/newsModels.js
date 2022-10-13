@@ -1,3 +1,4 @@
+const { query } = require("../db/connection");
 const db = require("../db/connection");
 
 exports.fetchTopics = () => {
@@ -42,16 +43,32 @@ exports.editArticleVotesByID = (id, IncVote) => {
     });
 };
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `SELECT articles.article_id, articles.title, articles.author, articles.topic, articles.created_at, articles.votes, COUNT(comments.comment_id) ::INT AS comment_count FROM articles
-      LEFT JOIN comments ON comments.article_id=articles.article_id
-      GROUP BY articles.article_id
-      ORDER BY articles.created_at DESC;`
-    )
-    .then(({ rows }) => {
-      console.log(rows);
-      return rows;
+exports.fetchArticles = (topic) => {
+  if (topic === "") {
+    return Promise.reject({
+      status: 400,
+      msg: `Bad Request, Please enter name of topic`,
     });
+  }
+  let queryStr = "";
+  if (topic === undefined) {
+    queryStr = `SELECT articles.*, COUNT(comments.comment_id) ::INT AS comment_count FROM articles
+LEFT JOIN comments ON comments.article_id=articles.article_id 
+GROUP BY articles.article_id
+ORDER BY articles.created_at DESC;`;
+  } else
+    queryStr = `SELECT articles.*, COUNT(comments.comment_id) ::INT AS comment_count FROM articles
+  LEFT JOIN comments ON comments.article_id=articles.article_id 
+  WHERE articles.topic='${topic}'
+  GROUP BY articles.article_id
+  ORDER BY articles.created_at DESC;`;
+  return db.query(queryStr).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: `No Topic Found For Topic ${topic}`,
+      });
+    }
+    return rows;
+  });
 };

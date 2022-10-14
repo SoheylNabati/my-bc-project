@@ -57,7 +57,7 @@ exports.fetchCommentsByArticleID = (id) => {
       return rows;
     });
   return Promise.all([promise1, promise2]).then((results) => {
-    if (results[0].length === 0 && reesults[1].length === 0) {
+    if (results[0].length === 0 && results[1].length === 0) {
       return Promise.reject({
         status: 404,
         msg: `No Articles Found For article id ${id}`,

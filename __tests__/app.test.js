@@ -196,6 +196,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .then(({ body }) => {
         const comments = body.comments;
         expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(11);
         comments.forEach((comment) => {
           expect(comment).toEqual(
             expect.objectContaining({
@@ -235,13 +236,13 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.msg).toEqual("Invalid ID");
       });
   });
-  // it("404: responds with an error msg when requested for a query that doesnt exist ", () => {
-  //   const article_id = 35;
-  //   return request(app)
-  //     .get(`/api/articles/${article_id}/comments`)
-  //     .expect(404)
-  //     .then(({ body }) => {
-  //       expect(body.msg).toBe(`No Articles Found For article id ${article_id}`);
-  //     });
-  // });
+  it("404: responds with an error msg when requested for a query that doesnt exist ", () => {
+    const article_id = 35;
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`No Articles Found For article id ${article_id}`);
+      });
+  });
 });

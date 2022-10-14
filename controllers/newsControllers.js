@@ -42,5 +42,7 @@ exports.getCommentsByArticleID = (req, res, next) => {
     .then((comments) => {
       return res.status(200).send({ comments });
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 };

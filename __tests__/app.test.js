@@ -187,7 +187,6 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-
 describe(`GET /api/articles`, () => {
   it("200: responds with an array of article obj which have properties of author, title, article_id, topic, created_at, votes, comment_count which is the total count of all the comments with this article_id", () => {
     return request(app)
@@ -219,37 +218,11 @@ describe(`GET /api/articles`, () => {
       .then(({ body }) => {
         const article = body.articles;
         expect(article).toBeSortedBy("created_at", {
-
-describe("GET /api/articles/:article_id/comments", () => {
-  it("200: responds with an array of comments for the given article_id and each comment should have properties of comment_id, votes, created_at, author and body sorted by created_at in descending order", () => {
-    const article_id = 1;
-    return request(app)
-      .get(`/api/articles/${article_id}/comments`)
-      .expect(200)
-      .then(({ body }) => {
-        const comments = body.comments;
-        expect(comments).toBeInstanceOf(Array);
-        expect(comments).toHaveLength(11);
-        comments.forEach((comment) => {
-          expect(comment).toEqual(
-            expect.objectContaining({
-              comment_id: expect.any(Number),
-              body: expect.any(String),
-              article_id: expect.any(Number),
-              author: expect.any(String),
-              votes: expect.any(Number),
-              created_at: expect.any(String),
-            })
-          );
-        });
-        expect(comments).toBeSortedBy("created_at", {
-
           descending: true,
           coerce: true,
         });
       });
   });
-
   it("200: accespts topic endpoint, which filters the articles by the topic value specified in the query.", () => {
     const topic = "cats";
     return request(app)
@@ -303,6 +276,37 @@ describe("GET /api/articles/:article_id/comments", () => {
         const articles = body.articles;
         expect(articles).toBeInstanceOf(Array);
         expect(articles).toHaveLength(0);
+      });
+  });
+});
+describe("GET /api/articles/:article_id/comments", () => {
+  it("200: responds with an array of comments for the given article_id and each comment should have properties of comment_id, votes, created_at, author and body sorted by created_at in descending order", () => {
+    const article_id = 1;
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        const comments = body.comments;
+        expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(11);
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+            })
+          );
+        });
+        expect(comments).toBeSortedBy("created_at", {
+          descending: true,
+          coerce: true,
+        });
+      });
+  });
 
   it("200: responds with an empty array when article exists but there are no comments", () => {
     const article_id = 4;

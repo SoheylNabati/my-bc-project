@@ -43,7 +43,6 @@ exports.editArticleVotesByID = (id, IncVote) => {
     });
 };
 
-
 exports.fetchArticles = (topic) => {
   if (topic === "") {
     return Promise.reject({
@@ -80,9 +79,9 @@ ORDER BY articles.created_at DESC;`;
         msg: `No Topic Found For Topic ${topic}`,
       });
     }
-    console.log(result[1]);
     return result[1];
-
+  });
+};
 exports.fetchCommentsByArticleID = (id) => {
   const promise1 = db
     .query(`SELECT articles.* FROM articles WHERE articles.article_id=$1`, [id])
@@ -105,6 +104,5 @@ exports.fetchCommentsByArticleID = (id) => {
       });
     }
     return results[1];
-
   });
 };

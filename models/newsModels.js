@@ -1,3 +1,4 @@
+const { query } = require("../db/connection");
 const db = require("../db/connection");
 
 exports.fetchTopics = () => {
@@ -42,6 +43,46 @@ exports.editArticleVotesByID = (id, IncVote) => {
     });
 };
 
+
+exports.fetchArticles = (topic) => {
+  if (topic === "") {
+    return Promise.reject({
+      status: 400,
+      msg: `Bad Request, Please enter name of topic`,
+    });
+  }
+  let queryStr = "";
+  if (topic === undefined) {
+    queryStr = `SELECT articles.*, COUNT(comments.comment_id) ::INT AS comment_count FROM articles
+LEFT JOIN comments ON comments.article_id=articles.article_id 
+GROUP BY articles.article_id
+ORDER BY articles.created_at DESC;`;
+  } else
+    queryStr = `SELECT articles.*, COUNT(comments.comment_id) ::INT AS comment_count FROM articles
+  LEFT JOIN comments ON comments.article_id=articles.article_id 
+  WHERE articles.topic='${topic}'
+  GROUP BY articles.article_id
+  ORDER BY articles.created_at DESC;`;
+  const promise1 = db
+    .query(`SELECT topics.* FROM topics WHERE topics.slug='${topic}';`)
+    .then(({ rows }) => {
+      const myArr = [];
+      if (rows[0] !== undefined) myArr.push(rows[0].slug);
+      return myArr;
+    });
+  const promise2 = db.query(queryStr).then(({ rows }) => {
+    return rows;
+  });
+  return Promise.all([promise1, promise2]).then((result) => {
+    if (result[1].length === 0 && result[0].length === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: `No Topic Found For Topic ${topic}`,
+      });
+    }
+    console.log(result[1]);
+    return result[1];
+
 exports.fetchCommentsByArticleID = (id) => {
   const promise1 = db
     .query(`SELECT articles.* FROM articles WHERE articles.article_id=$1`, [id])
@@ -64,5 +105,6 @@ exports.fetchCommentsByArticleID = (id) => {
       });
     }
     return results[1];
+
   });
 };

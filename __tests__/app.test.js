@@ -187,6 +187,39 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
+
+describe(`GET /api/articles`, () => {
+  it("200: responds with an array of article obj which have properties of author, title, article_id, topic, created_at, votes, comment_count which is the total count of all the comments with this article_id", () => {
+    return request(app)
+      .get(`/api/articles`)
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.articles;
+        expect(article).toBeInstanceOf(Array);
+        article.forEach((each) => {
+          expect(each).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              body: expect.any(String),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  it("200: responds with an array of article objects which are sorted by date in descending order", () => {
+    return request(app)
+      .get(`/api/articles`)
+      .expect(200)
+      .then(({ body }) => {
+        const article = body.articles;
+        expect(article).toBeSortedBy("created_at", {
+
 describe("GET /api/articles/:article_id/comments", () => {
   it("200: responds with an array of comments for the given article_id and each comment should have properties of comment_id, votes, created_at, author and body sorted by created_at in descending order", () => {
     const article_id = 1;
@@ -210,11 +243,67 @@ describe("GET /api/articles/:article_id/comments", () => {
           );
         });
         expect(comments).toBeSortedBy("created_at", {
+
           descending: true,
           coerce: true,
         });
       });
   });
+
+  it("200: accespts topic endpoint, which filters the articles by the topic value specified in the query.", () => {
+    const topic = "cats";
+    return request(app)
+      .get(`/api/articles?topic=${topic}`)
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        const filtered = articles.filter((article) => article.topic === topic);
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(1);
+        filtered.forEach((each) => {
+          expect(each).toEqual(
+            expect.objectContaining({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              body: expect.any(String),
+              topic: topic,
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  it("400: responds with an error msg when the requested topic is not given", () => {
+    const topic = "";
+    return request(app)
+      .get(`/api/articles?topic=${topic}`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`Bad Request, Please enter name of topic`);
+      });
+  });
+  it("404: responds with an error msg when requested for a query that doesnt exist ", () => {
+    const topic = "cheese";
+    return request(app)
+      .get(`/api/articles?topic=${topic}`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(`No Topic Found For Topic ${topic}`);
+      });
+  });
+  it("200: responds with an empty array when a topic exists but there are no articles for that topic", () => {
+    const topic = "paper";
+    return request(app)
+      .get(`/api/articles?topic=${topic}`)
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toHaveLength(0);
+
   it("200: responds with an empty array when article exists but there are no comments", () => {
     const article_id = 4;
     return request(app)

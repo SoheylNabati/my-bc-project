@@ -3,7 +3,11 @@ const {
   fetchArticle,
   fetchUsers,
   editArticleVotesByID,
+
+  fetchArticles,
+
   fetchCommentsByArticleID,
+
 } = require("../models/newsModels");
 exports.getTopics = (req, res, next) => {
   return fetchTopics().then((topics) => {
@@ -36,6 +40,15 @@ exports.patchArticleVotesByID = (req, res, next) => {
     .catch(next);
 };
 
+
+exports.getArticles = (req, res, next) => {
+  const { topic } = req.query;
+  return fetchArticles(topic)
+    .then((articles) => {
+      return res.status(200).send({ articles });
+    })
+    .catch(next);
+
 exports.getCommentsByArticleID = (req, res, next) => {
   const { article_id } = req.params;
   return fetchCommentsByArticleID(article_id)
@@ -45,4 +58,5 @@ exports.getCommentsByArticleID = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+
 };

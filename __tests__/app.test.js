@@ -186,3 +186,62 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  it("200: responds with an array of comments for the given article_id and each comment should have properties of comment_id, votes, created_at, author and body sorted by created_at in descending order", () => {
+    const article_id = 1;
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        const comments = body.comments;
+        expect(comments).toBeInstanceOf(Array);
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+            })
+          );
+        });
+        expect(comments).toBeSortedBy("created_at", {
+          descending: true,
+          coerce: true,
+        });
+      });
+  });
+  it("200: responds with an empty array when article exists but there are no comments", () => {
+    const article_id = 4;
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        const comments = body.comments;
+        expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(0);
+      });
+  });
+  it("400: responds with an error msg when passed an invalid data type for article id", () => {
+    const article_id = "protein";
+
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual("Invalid ID");
+      });
+  });
+  // it("404: responds with an error msg when requested for a query that doesnt exist ", () => {
+  //   const article_id = 35;
+  //   return request(app)
+  //     .get(`/api/articles/${article_id}/comments`)
+  //     .expect(404)
+  //     .then(({ body }) => {
+  //       expect(body.msg).toBe(`No Articles Found For article id ${article_id}`);
+  //     });
+  // });
+});

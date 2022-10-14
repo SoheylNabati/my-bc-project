@@ -3,6 +3,7 @@ const {
   fetchArticle,
   fetchUsers,
   editArticleVotesByID,
+  fetchCommentsByArticleID,
 } = require("../models/newsModels");
 exports.getTopics = (req, res, next) => {
   return fetchTopics().then((topics) => {
@@ -36,7 +37,10 @@ exports.patchArticleVotesByID = (req, res, next) => {
 };
 
 exports.getCommentsByArticleID = (req, res, next) => {
+  const { article_id } = req.params;
   return fetchCommentsByArticleID(article_id)
-    .then(() => {})
+    .then((comments) => {
+      return res.status(200).send({ comments });
+    })
     .catch(next);
 };

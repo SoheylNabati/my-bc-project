@@ -41,3 +41,28 @@ exports.editArticleVotesByID = (id, IncVote) => {
       return rows[0];
     });
 };
+
+exports.fetchCommentsByArticleID = (id) => {
+  const promise1 = db
+    .query(`SELECT articles.* FROM articles WHERE articles.article_id=$1`, [id])
+    .then(({ rows }) => {
+      return rows;
+    });
+  const promise2 = db
+    .query(
+      `SELECT comments.* FROM comments WHERE comments.article_id=$1 ORDER BY comments.created_at DESC`,
+      [id]
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+  return Promise.all([promise1, promise2]).then((results) => {
+    if (results[0].length === 0 && results[1].length === 0) {
+      return Promise.reject({
+        status: 404,
+        msg: `No Articles Found For article id ${id}`,
+      });
+    }
+    return results[1];
+  });
+};

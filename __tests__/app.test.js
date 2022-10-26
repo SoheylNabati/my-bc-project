@@ -279,7 +279,70 @@ describe(`GET /api/articles`, () => {
         expect(articles).toHaveLength(0);
       });
   });
+  it("200: it can sort articles by any valid column", () => {
+    const sort_by = "votes";
+    return request(app)
+      .get(`/api/articles?sort_by=${sort_by}`)
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toBeSortedBy(`${sort_by}`, {
+          descending: true,
+          coerce: true,
+        });
+      });
+  });
+  it("200: it can sort articles by date if no sort by was requested from query", () => {
+    return request(app)
+      .get(`/api/articles`)
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toBeSortedBy(`created_at`, {
+          descending: true,
+          coerce: true,
+        });
+      });
+  });
+  it("400: it responds with an error msg when requested to be sorted by a column that doesnt exist", () => {
+    const sort_by = "cheese";
+    return request(app)
+      .get(`/api/articles?sort_by=${sort_by}`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toEqual(
+          `can not sort articles, please sort by a valid column`
+        );
+      });
+  });
+  it("200: it can change the order of sorting by desc or asc ", () => {
+    const order = "ASC";
+    return request(app)
+      .get(`/api/articles?order=${order}`)
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toBeSortedBy(`created_at`);
+      });
+  });
+  it("200: it will sort in desc order if no order was requested from query", () => {
+    return request(app)
+      .get(`/api/articles`)
+      .expect(200)
+      .then(({ body }) => {
+        const articles = body.articles;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles).toBeSortedBy(`created_at`, {
+          descending: true,
+          coerce: true,
+        });
+      });
+  });
 });
+
 describe("GET /api/articles/:article_id/comments", () => {
   it("200: responds with an array of comments for the given article_id and each comment should have properties of comment_id, votes, created_at, author and body sorted by created_at in descending order", () => {
     const article_id = 1;
@@ -337,6 +400,108 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe(`No Articles Found For article id ${article_id}`);
+      });
+  });
+});
+
+describe(`POST /api/articles/:article_id/comments`, () => {
+  it("201: requst accepts an object with username and body property and responds with the posted comment", () => {
+    const article_id = 4;
+    const myComment = {
+      username: "rogersop",
+      body: "I'm Posting My First Comment",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(myComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            body: myComment.body,
+            article_id: 4,
+            author: myComment.username,
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+  it("400: responds with an error msg when passed an invalid data type for article id", () => {
+    const article_id = "BestOne";
+    const myComment = {
+      username: "rogersop",
+      body: "Num One Comment Of ALL TIME",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(myComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid ID");
+      });
+  });
+  it("404: responds with an error msg when requested for a query that doesnt exist", () => {
+    const article_id = 4523;
+    const myComment = {
+      username: "rogersop",
+      body: "I'll Give It A Go",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(myComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(
+          `article with article id ${article_id} doesn't exist`
+        );
+      });
+  });
+  it("404: responds with an error msg when username of comment doesnt exist", () => {
+    const article_id = 4;
+    const myComment = {
+      username: "hello",
+      body: "I'll Give It A Go",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(myComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe(
+          `username with username id ${myComment.username} doesn't exist`
+        );
+      });
+  });
+  it("400: responds with an error msg when username for comment not provided", () => {
+    const article_id = 4;
+    const myComment = {
+      body: "I'll Give It A Go",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(myComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(
+          `you must enter data for username and comment fields`
+        );
+      });
+  });
+  it("400: responds with an error msg when body for comment not provided", () => {
+    const article_id = 4;
+    const myComment = {
+      username: "rogersop",
+    };
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send(myComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe(
+          `you must enter data for username and comment fields`
+        );
       });
   });
 });

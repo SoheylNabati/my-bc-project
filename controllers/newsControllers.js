@@ -3,10 +3,9 @@ const {
   fetchArticle,
   fetchUsers,
   editArticleVotesByID,
-
   fetchArticles,
-
   fetchCommentsByArticleID,
+  addCommentByArticleId,
 } = require("../models/newsModels");
 exports.getTopics = (req, res, next) => {
   return fetchTopics().then((topics) => {
@@ -40,8 +39,8 @@ exports.patchArticleVotesByID = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  const { topic } = req.query;
-  return fetchArticles(topic)
+  const { topic, sort_by, order } = req.query;
+  return fetchArticles(topic, sort_by, order)
     .then((articles) => {
       return res.status(200).send({ articles });
     })
@@ -57,4 +56,14 @@ exports.getCommentsByArticleID = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.postCommentByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  const comment = req.body;
+  return addCommentByArticleId(article_id, comment)
+    .then((comment) => {
+      return res.status(201).send({ comment });
+    })
+    .catch(next);
 };
